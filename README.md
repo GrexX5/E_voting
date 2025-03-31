@@ -1,8 +1,3 @@
-# E_voting
-
-<<<<<<< HEAD
-# E_voting
-=======
 # Système de Vote en Ligne
 
 Un système de vote en ligne moderne avec une interface administrateur et utilisateur.
@@ -58,7 +53,7 @@ e-voting/
 ├── server.js
 ├── database.sql
 ├── package.json
-└── .env
+└── .env 
 ```
 
 ## Sécurité
@@ -71,4 +66,3 @@ e-voting/
 ## Licence
 
 MIT
->>>>>>> b49b878 (Initial commit)
