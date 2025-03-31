@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - E-Voting</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="h-full">
+    <div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div>
+                <h1 class="text-center text-3xl font-bold text-gray-900">E-Voting</h1>
+                <h2 class="mt-6 text-center text-2xl font-bold text-gray-900">Inscription</h2>
+            </div>
+            <div class="card">
+                <form id="signupForm" class="space-y-6">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <div class="mt-1">
+                            <input id="email" name="email" type="email" required class="input" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
+                        <div class="mt-1">
+                            <input id="password" name="password" type="password" required class="input" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn btn-primary w-full">
+                            S'inscrire
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erreur lors de l\'inscription');
+                }
+
+                alert('Inscription réussie ! Vous pouvez maintenant vous connecter.');
+                window.location.href = '/login.html';
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert(error.message || 'Erreur lors de l\'inscription');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variables de couleurs personnalisées */
+:root {
+    --color-primary-50: #f0f9ff;
+    --color-primary-100: #e0f2fe;
+    --color-primary-200: #bae6fd;
+    --color-primary-300: #7dd3fc;
+    --color-primary-400: #38bdf8;
+    --color-primary-500: #0ea5e9;
+    --color-primary-600: #0284c7;
+    --color-primary-700: #0369a1;
+    --color-primary-800: #075985;
+    --color-primary-900: #0c4a6e;
+}
+
+/* Styles personnalisés */
+.text-primary-600 {
+    color: var(--color-primary-600);
+}
+
+.bg-primary-600 {
+    background-color: var(--color-primary-600);
+}
+
+.hover\:bg-primary-500:hover {
+    background-color: var(--color-primary-500);
+}
+
+.focus\:border-primary-500:focus {
+    border-color: var(--color-primary-500);
+}
+
+.focus\:ring-primary-500:focus {
+    --tw-ring-color: var(--color-primary-500);
+}
+
+.focus-visible\:outline-primary-600:focus-visible {
+    outline-color: var(--color-primary-600);
+}
+
+@layer components {
+    .btn {
+        @apply px-4 py-2 rounded-md font-medium transition-colors duration-200;
+    }
+
+    .btn-primary {
+        @apply bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+    }
+
+    .input {
+        @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500;
+    }
+
+    .card {
+        @apply bg-white shadow-md rounded-lg p-6;
+    }
+
+    .nav-link {
+        @apply inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-700;
+    }
+
+    .nav-link.active {
+        @apply border-b-2 border-blue-500 text-gray-900;
+    }
+}
+
+/* Toast animations */
+.translate-y-0 {
+    transform: translateY(0);
+}
+
+.translate-y-full {
+    transform: translateY(100%);
+}
+
+/* Transitions */
+.transition-transform {
+    transition-property: transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.duration-300 {
+    transition-duration: 300ms;
+}
+
+/* Styles pour les formulaires */
+input[type="text"],
+input[type="url"],
+textarea {
+    @apply block w-full rounded-md border-gray-300 shadow-sm;
+}
+
+/* Styles pour les boutons */
+button {
+    @apply transition-colors duration-200;
+}
+
+/* Styles pour le tableau */
+table {
+    @apply min-w-full divide-y divide-gray-300;
+}
+
+th {
+    @apply py-3.5 text-left text-sm font-semibold text-gray-900;
+}
+
+td {
+    @apply whitespace-nowrap py-4 text-sm text-gray-900;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+    .grid-cols-1 {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+}

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Voting - Système de Vote en Ligne</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="h-full">
+    <!-- Navigation -->
+    <nav class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-2xl font-bold text-blue-600">E-Voting</h1>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="#home" class="nav-link active" onclick="showSection('home')">Accueil</a>
+                        <a href="#vote" class="nav-link" onclick="showSection('vote')">Voter</a>
+                        <a href="#results" class="nav-link" onclick="showSection('results')">Résultats</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <div id="authButtons">
+                        <a href="/login.html" class="btn btn-primary">Connexion</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Section principale -->
+    <section id="home" class="section bg-primary-600 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-bold">Bienvenue sur E-Voting</h1>
+            <p class="mt-4 text-lg">Participez aux élections en ligne de manière simple, sécurisée et transparente.</p>
+            <button class="btn btn-primary mt-6" onclick="showSection('vote')">Votez maintenant</button>
+        </div>
+    </section>
+
+    <!-- Section des candidats pour voter -->
+    <section id="vote" class="section hidden py-12 bg-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-gray-900 text-center mb-8">Votez pour un candidat</h2>
+            <div id="candidateList" class="candidate-grid">
+                <!-- Les candidats seront chargés dynamiquement ici -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Section des résultats -->
+    <section id="results" class="section hidden py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-gray-900 text-center mb-8">Résultats des votes</h2>
+            <div id="resultsList" class="results-grid">
+                <!-- Les résultats seront chargés dynamiquement ici -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2025 E-Voting. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Fonction pour afficher une section et masquer les autres
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                if (section.id === sectionId) {
+                    section.classList.remove('hidden');
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+
+            // Mettre à jour les liens actifs
+            const links = document.querySelectorAll('.nav-link');
+            links.forEach(link => {
+                if (link.getAttribute('href') === `#${sectionId}`) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        // Vérifier si l'utilisateur est connecté
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const authButtons = document.getElementById('authButtons');
+            
+            if (token) {
+                authButtons.innerHTML = `
+                    <button onclick="logout()" class="btn btn-primary">Déconnexion</button>
+                `;
+            }
+
+            // Charger les candidats et les résultats dynamiquement
+            loadCandidates();
+            loadResults();
+        });
+
+        // Fonction de déconnexion
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/';
+        }
+
+        // Charger les candidats pour voter
+        async function loadCandidates() {
+            try {
+                const response = await fetch('/api/candidates');
+                if (!response.ok) throw new Error('Erreur lors du chargement des candidats');
+                const candidates = await response.json();
+
+                const candidateList = document.getElementById('candidateList');
+                candidateList.innerHTML = ''; // Réinitialiser la liste
+
+                candidates.forEach(candidate => {
+                    const div = document.createElement('div');
+                    div.classList.add('candidate-card');
+                    div.innerHTML = `
+                        <div class="px-4 py-5 sm:p-6">
+                            <img src="${candidate.photo_url}" alt="${candidate.name}" class="candidate-photo">
+                            <h3 class="text-lg font-medium text-gray-900 mb-2 text-center">${candidate.name}</h3>
+                            <p class="text-gray-600 text-center">${candidate.description}</p>
+                            <div class="mt-4 text-center">
+                                <button class="btn btn-primary" onclick="voteForCandidate(${candidate.id})">Votez pour ${candidate.name}</button>
+                            </div>
+                        </div>
+                    `;
+                    candidateList.appendChild(div);
+                });
+            } catch (error) {
+                console.error(error.message);
+            }
+        }
+
+        // Fonction pour voter pour un candidat
+        async function voteForCandidate(candidateId) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Veuillez vous connecter pour voter.');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/votes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ candidateId })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Erreur lors du vote');
+                }
+
+                alert('Votre vote a été enregistré avec succès !');
+                loadResults(); // Mettre à jour les résultats après le vote
+                showSection('results'); // Afficher la section des résultats
+            } catch (error) {
+                console.error(error.message);
+                alert(error.message);
+            }
+        }
+
+        // Charger les résultats des votes
+        async function loadResults() {
+            try {
+                const response = await fetch('/api/votes/stats');
+                if (!response.ok) throw new Error('Erreur lors du chargement des résultats');
+                const stats = await response.json();
+
+                const resultsList = document.getElementById('resultsList');
+                resultsList.innerHTML = ''; // Réinitialiser la liste
+
+                stats.byCandidate.forEach(candidate => {
+                    const div = document.createElement('div');
+                    div.classList.add('result-card');
+                    div.innerHTML = `
+                        <div class="px-4 py-5 sm:p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-2 text-center">${candidate.name}</h3>
+                            <p class="text-gray-600 text-center">Votes : ${candidate.votes}</p>
+                        </div>
+                    `;
+                    resultsList.appendChild(div);
+                });
+            } catch (error) {
+                console.error(error.message);
+            }
+        }
+    </script>
+</body>
+</html>

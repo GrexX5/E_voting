@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - E-Voting</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="h-full">
+    <div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div>
+                <h1 class="text-center text-3xl font-bold text-gray-900">E-Voting</h1>
+                <h2 class="mt-6 text-center text-2xl font-bold text-gray-900">Connexion</h2>
+            </div>
+            <div class="card">
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <div class="mt-1">
+                            <input id="email" name="email" type="email" required class="input" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
+                        <div class="mt-1">
+                            <input id="password" name="password" type="password" required class="input" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn btn-primary w-full">
+                            Se connecter
+                        </button>
+
+                        <p class="mt-2 text-center text-sm text-gray-600">
+                            Pas encore inscrit ? <a href="/signup.html" class="font-medium text-primary-600 hover:text-primary-500">Créer un compte</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de notification -->
+    <div id="toast" class="fixed bottom-4 right-4 transform transition-transform duration-300 translate-y-full">
+        <div class="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5">
+            <div class="p-4">
+                <div class="flex items-center">
+                    <div class="flex-1 w-0">
+                        <p id="toastMessage" class="text-sm font-medium text-gray-900"></p>
+                    </div>
+                    <div class="ml-4 flex-shrink-0">
+                        <button type="button" onclick="hideToast()" class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <span class="sr-only">Fermer</span>
+                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toastMessage.className = isError ? 'text-red-600' : 'text-gray-900';
+            toast.classList.remove('translate-y-full');
+            toast.classList.add('translate-y-0');
+            setTimeout(hideToast, 3000);
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-0');
+            toast.classList.add('translate-y-full');
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erreur de connexion');
+                }
+
+                localStorage.setItem('token', data.token);
+                
+                if (data.user && data.user.is_admin) {
+                    window.location.href = '/admin/dashboard.html';
+                } else {
+                    window.location.href = '/index.html';
+                }
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                showToast(error.message || 'Erreur de connexion', true);
+            }
+        });
+    </script>
+</body>
+</html>
