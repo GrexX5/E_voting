@@ -63,6 +63,4 @@ e-voting/
 - Protection contre les injections SQL
 - Validation des données côté serveur
 
-## Licence
 
-MIT
